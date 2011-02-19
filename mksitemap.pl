@@ -45,7 +45,7 @@ while (my $row = $sth->fetchrow_hashref) {
 		$num_urls = 0;
 	}
 
-	print $fh qq|<url><loc>http://koha.ffzg.hr/cgi-bin/koha/opac-detail.pl?biblionumber=$row->{biblionumber}</loc></url>\n|;
+	print $fh qq|<url><loc>http://koha.ffzg.hr/cgi-bin/koha/opac-detail.pl?biblionumber=$row->{biblionumber}</loc><lastmod>$row->{lastmod}</lastmod></url>\n|;
 	$num_urls++;
 
 	# standard limit to 10 mb uncompressed and 50000 urls
@@ -58,7 +58,8 @@ while (my $row = $sth->fetchrow_hashref) {
 
 }
 
+warn "# closing $sitemap_nr with ", -s $fh, " bytes and $num_urls urls";
 print $fh qq{</urlset>\n};
 close($fh);
-warn "# closing $sitemap_nr with ", -s $fh, " bytes and $num_urls urls";
 
+$dbh->rollback;
