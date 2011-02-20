@@ -41,14 +41,14 @@ while (my $row = $sth->fetchrow_hashref) {
 
 	if ( ! $fh ) {
 		$sitemap_nr++;
-		my $path = "out/sitemap$sitemap_nr.xml";
+		my $path = "out/$sitemap_nr.xml";
 		open($fh, '>', $path) || die "$path: $!";
 		warn "# $path created";
 
 		print $fh qq|<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n|;
 		$num_urls = 0;
 
-		print $index qq|<sitemap><loc>http://koha.ffzg.hr/sitemap$sitemap_nr.xml</loc></sitemap>\n|;
+		print $index qq|<sitemap><loc>http://koha.ffzg.hr/sitemap/$sitemap_nr.xml</loc></sitemap>\n|;
 	}
 
 	print $fh qq|<url><loc>http://koha.ffzg.hr/cgi-bin/koha/opac-detail.pl?biblionumber=$row->{biblionumber}</loc><lastmod>$row->{lastmod}</lastmod></url>\n|;
