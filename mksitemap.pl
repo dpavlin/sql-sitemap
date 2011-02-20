@@ -75,4 +75,10 @@ print $index qq|</sitemapindex>|;
 print "# closing index with ", -s $index, " bytes\n";
 close($index);
 
+if ( $sitemap_nr == 1 ) {
+	unlink "out/$config.xml" && rename "out/$config.1.xml", "out/$config.xml" || die $!;
+	warn "# using single sitemap xml file out/$config.xml\n";
+}
+
+
 $dbh->rollback;
