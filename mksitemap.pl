@@ -8,22 +8,23 @@ use Data::Dump qw(dump);
 
 my $debug = 0;
 
-our $user     = 'kohaadmin';
-our $passwd   = '';
+my $config = shift @ARGV || die "usage: $0 sql/config.sql";
 
-require 'config.pl';
+my $c;
 
-our $dsn      = 'DBI:mysql:dbname=koha';
+open(my $sql_fh, '<', $config) || die "$config: $!";
+while(<$sql_fh>) {
+	if ( m/^--\s*(\w+):(\S+)/ ) {
+		$c->{$1} = $2;
+		warn "# config $1 = $2\n";
+	} else {
+		$c->{sql} .= $_;
+	}
+}
 
-my $dbh = DBI->connect($dsn, $user,$passwd, { RaiseError => 1, AutoCommit => 0 }) || die $DBI::errstr;
+my $dbh = DBI->connect( 'DBI:' . $c->{DBI}, $c->{user},$c->{password}, { RaiseError => 1, AutoCommit => 0 }) || die $DBI::errstr;
 
-my $sth = $dbh->prepare(q{
-	select
-		biblionumber,
-		date(timestamp) as lastmod
-	from biblio
-	order by timestamp desc
-});
+my $sth = $dbh->prepare($c->{sql});
 
 my $rows = $sth->execute();
 
@@ -51,7 +52,7 @@ while (my $row = $sth->fetchrow_hashref) {
 		print $index qq|<sitemap><loc>http://koha.ffzg.hr/sitemap/$sitemap_nr.xml</loc></sitemap>\n|;
 	}
 
-	print $fh qq|<url><loc>http://koha.ffzg.hr/cgi-bin/koha/opac-detail.pl?biblionumber=$row->{biblionumber}</loc><lastmod>$row->{lastmod}</lastmod></url>\n|;
+	print $fh qq|<url><loc>$row->{loc}</loc><lastmod>$row->{lastmod}</lastmod></url>\n|;
 	$num_urls++;
 
 	# standard limit to 10 mb uncompressed and 50000 urls
