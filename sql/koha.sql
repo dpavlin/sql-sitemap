@@ -1,6 +1,8 @@
 -- DBI:mysql:dbname=koha
 -- user:sitemap
 
+-- url:http://koha.ffzg.hr/sitemap/koha.xml
+
 -- you need to grant priviledges to this user using something like:
 -- mysql> grant select on koha.biblio to 'sitemap'@'localhost';
 
